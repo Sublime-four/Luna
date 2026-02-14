@@ -27,10 +27,9 @@ body{
 #fx{
   position:fixed;
   inset:0;
-  z-index:0;
-  pointer-events:none;
-}
-
+  z-index: 999;         /* ANTES: 0  -> ahora se ve encima */
+  pointer-events:none;  /* no bloquea clicks */
+}   
 .topbar{
   position:sticky;
   top:0;
