@@ -199,35 +199,94 @@ main{position:relative; z-index:1}
   cursor:pointer;
   user-select:none;
   outline:none;
+  overflow:hidden; /* CLAVE: evita que la carta se salga */
 }
+
+/* Capas */
+.env-paper{ position:absolute; z-index: 4; }
+.env-front{ position:absolute; z-index: 5; pointer-events:none; }
+.env-top{ position:absolute; z-index: 6; }
+.env-heart{ position:absolute; z-index: 7; }
+
+/* Base común */
 .env-front, .env-top{
-  position:absolute; inset:0;
   border-radius:20px;
   background: linear-gradient(135deg, #fff, #ffe9f5);
   border:1px solid var(--line);
 }
+
+/* Tapa superior */
 .env-top{
+  inset:0;
   clip-path: polygon(0 0, 100% 0, 50% 55%);
   background: linear-gradient(135deg, #fff, #eaf2ff);
   transform-origin: top;
   transition: transform .6s cubic-bezier(.2,.8,.2,1);
 }
+
+/* Frente inferior */
 .env-front{
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 55%);
+  left:0;
+  right:0;
+  bottom:0;
+  height:70%;
+  border-top-left-radius:0;
+  border-top-right-radius:0;
+  background: linear-gradient(135deg, #fff, #ffe9f5);
+  clip-path: polygon(0 0, 50% 45%, 100% 0, 100% 100%, 0 100%);
+  transition: transform .6s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
 }
+
+/* Papel */
 .env-paper{
-  position:absolute;
-  left:18px; right:18px;
+  left:18px;
+  right:18px;
   bottom:18px;
   height:235px;
   border-radius:16px;
   background:#fff;
   border:1px solid var(--line);
   box-shadow: 0 12px 30px rgba(0,0,0,.08);
-  transform: translateY(78px);
+  transform: translateY(160px); /* cerrada: totalmente escondida */
   transition: transform .7s cubic-bezier(.2,.9,.2,1);
-  overflow:hidden;
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom:14px;
 }
+
+/* Abierto */
+.envelope.open .env-top{
+  transform: rotateX(180deg);
+}
+
+/* La carta sube bien arriba */
+.envelope.open .env-paper{
+  transform: translateY(-80px);
+}
+
+/* El frente baja ligeramente sin deformarse */
+.envelope.open .env-front{
+  transform: translateY(60%);
+  opacity: .15;
+}
+
+/* Corazón */
+.env-heart{
+  left:50%;
+  top:54%;
+  transform: translate(-50%,-50%);
+}
+
+/* Scroll elegante */
+.env-paper::-webkit-scrollbar{
+  width:8px;
+}
+
+.env-paper::-webkit-scrollbar-thumb{
+  background: rgba(255,92,168,.25);
+  border-radius:999px;
+}
+
 .paper-inner{padding:16px 16px 18px; font-size:14px; line-height:1.5}
 .paper-title{font-weight:900; margin:0 0 6px}
 .paper-sign{margin-top:10px}
