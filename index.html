@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>San Valentín — Luna Maria Ortiz Hortua 💘</title>
+  <meta name="description" content="Una página romántica e interactiva para San Valentín." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">💗</span>
+      <div class="brand-text">
+        <strong>San Valentín</strong>
+        <small>para <span class="accent">Luna Maria Ortiz Hortua</span></small>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="#inicio">Inicio</a>
+      <a href="#carta">Carta</a>
+      <a href="#contador">Nuestro tiempo</a>
+      <a href="#timeline">Historia</a>
+      <a href="#galeria">Recuerdos</a>
+      <a href="#juegos">Interacciones</a>
+      <a href="#final">Final</a>
+    </nav>
+
+    <div class="actions">
+      <button class="btn ghost" id="musicBtn" type="button" aria-pressed="false" title="Música">
+        🔈 Música
+      </button>
+      <button class="btn" id="confettiBtn" type="button" title="Lluvia de amor">
+        ✨ Confeti
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section id="inicio" class="section hero">
+      <div class="hero-card">
+        <p class="kicker">Operación: Romance en producción ✅</p>
+        <h1 class="title">
+          Luna Maria Ortiz Hortua
+          <span class="subtitle">mi San Valentín</span>
+        </h1>
+
+        <p class="lead">
+          Esta página es mi forma de decirte que, desde que llegaste,
+          mi corazón dejó de ser “modo avión”.
+        </p>
+
+        <div class="hero-metrics">
+          <div class="metric">
+            <div class="metric-label">Somos novios desde</div>
+            <div class="metric-value" id="sinceLabel">12/10/2025</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Estado</div>
+            <div class="metric-value">Enamoradísimo 💘</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Prioridad</div>
+            <div class="metric-value">Tú (P0)</div>
+          </div>
+        </div>
+
+        <div class="hero-cta">
+          <button class="btn big" id="startHearts" type="button">💞 Activar corazones</button>
+          <a class="btn big ghost" href="#carta">📩 Leer la carta</a>
+        </div>
+
+        <div class="tip">
+          Tip: toca el fondo, mueve el mouse o usa el botón de confeti. Esto es interactivo de verdad 😌
+        </div>
+      </div>
+    </section>
+
+    <!-- CARTA -->
+    <section id="carta" class="section">
+      <div class="grid two">
+        <div class="card">
+          <h2 class="h2">📩 Mi carta para ti</h2>
+          <p class="muted">Haz clic para abrir el sobre y revelar la carta.</p>
+
+          <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Abrir carta">
+            <div class="env-top"></div>
+            <div class="env-paper">
+              <div class="paper-inner">
+                <p class="paper-title">Luna,</p>
+                <p>
+                  Hoy te celebro con todo: con mis detalles, mis ganas, y mi corazón
+                  en modo “para siempre”.
+                </p>
+                <p>
+                  Gracias por tu forma de querer, por tu luz y por ser mi lugar favorito.
+                  Si el mundo se pone pesado, yo pongo el abrazo.
+                </p>
+                <p>
+                  Te elijo hoy, te elijo mañana, y te elijo cuando el calendario se quede sin hojas.
+                </p>
+                <p class="paper-sign">Con amor, <br><strong>Tu novio 💗</strong></p>
+              </div>
+            </div>
+            <div class="env-front"></div>
+            <div class="env-heart">💖</div>
+          </div>
+
+          <div class="row">
+            <button class="btn ghost" id="copyLetter" type="button">📋 Copiar carta</button>
+            <button class="btn" id="downloadLove" type="button">💾 Guardar recuerdo (TXT)</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="h2">🌷 Promesas (nivel enterprise)</h2>
+          <p class="muted">Marca tus favoritas. Las promesas marcadas se guardan en tu navegador.</p>
+
+          <div class="checks" id="promises">
+            <label class="check">
+              <input type="checkbox" data-key="p1">
+              <span>Siempre sumar paz a tu día.</span>
+            </label>
+            <label class="check">
+              <input type="checkbox" data-key="p2">
+              <span>Celebrarte incluso en días normales.</span>
+            </label>
+            <label class="check">
+              <input type="checkbox" data-key="p3">
+              <span>Hacerte reír cuando el mundo se ponga serio.</span>
+            </label>
+            <label class="check">
+              <input type="checkbox" data-key="p4">
+              <span>Cuidar lo nuestro con paciencia y cariño.</span>
+            </label>
+            <label class="check">
+              <input type="checkbox" data-key="p5">
+              <span>Ser tu equipo, siempre.</span>
+            </label>
+          </div>
+
+          <div class="badge" id="promiseBadge">💗 0/5 activadas</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTADOR -->
+    <section id="contador" class="section">
+      <div class="card wide">
+        <div class="row space">
+          <div>
+            <h2 class="h2">⏳ Nuestro tiempo juntos</h2>
+            <p class="muted">Contador en tiempo real desde que empezamos: <strong>12/10/2025</strong>.</p>
+          </div>
+          <div class="pill" id="loveLevel">Amor: 100%</div>
+        </div>
+
+        <div class="counters">
+          <div class="counter">
+            <div class="num" id="days">—</div>
+            <div class="lbl">días</div>
+          </div>
+          <div class="counter">
+            <div class="num" id="hours">—</div>
+            <div class="lbl">horas</div>
+          </div>
+          <div class="counter">
+            <div class="num" id="minutes">—</div>
+            <div class="lbl">minutos</div>
+          </div>
+          <div class="counter">
+            <div class="num" id="seconds">—</div>
+            <div class="lbl">segundos</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn ghost" id="toggleCountMode" type="button">🔁 Cambiar modo (desde / hasta aniversario)</button>
+          <button class="btn" id="sparkBtn" type="button">🌟 Subir “amor”</button>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-label">Barra de amor (sí, KPI romántico):</div>
+          <div class="progress">
+            <div class="progress-bar" id="progressBar" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section id="timeline" class="section">
+      <div class="card wide">
+        <h2 class="h2">🗓️ Nuestra historia</h2>
+        <p class="muted">Una línea del tiempo para que esto se sienta oficial (y precioso).</p>
+
+        <div class="timeline">
+          <div class="t-item">
+            <div class="t-dot">💞</div>
+            <div class="t-content">
+              <h3>12/10/2025 — Empezamos</h3>
+              <p>El día que el “nosotros” se volvió real.</p>
+            </div>
+          </div>
+          <div class="t-item">
+            <div class="t-dot">🌙</div>
+            <div class="t-content">
+              <h3>Primeras citas</h3>
+              <p>Risas, nervios, y esa vibra bonita que no se negocia.</p>
+            </div>
+          </div>
+          <div class="t-item">
+            <div class="t-dot">🍓</div>
+            <div class="t-content">
+              <h3>Momentos favoritos</h3>
+              <p>Los que vivimos… y los que vienen (spoiler: serán mejores).</p>
+            </div>
+          </div>
+          <div class="t-item">
+            <div class="t-dot">💍</div>
+            <div class="t-content">
+              <h3>Roadmap</h3>
+              <p>Más planes, más abrazos, más “tú y yo”.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn ghost" id="addMomentBtn" type="button">➕ Agregar momento</button>
+          <span class="muted small">Se guarda localmente (solo en este navegador).</span>
+        </div>
+
+        <div class="moments" id="moments"></div>
+      </div>
+    </section>
+
+    <!-- GALERÍA -->
+    <section id="galeria" class="section">
+      <div class="card wide">
+        <div class="row space">
+          <div>
+            <h2 class="h2">🖼️ Recuerdos</h2>
+            <p class="muted">Pon aquí sus fotos favoritas. Por ahora te dejo placeholders bonitos.</p>
+          </div>
+          <label class="btn ghost file">
+            📷 Cargar fotos
+            <input id="photoInput" type="file" accept="image/*" multiple hidden />
+          </label>
+        </div>
+
+        <div class="gallery" id="gallery">
+          <button class="shot" data-placeholder="1" type="button" aria-label="Recuerdo 1">
+            <span>💗</span><small>Recuerdo 1</small>
+          </button>
+          <button class="shot" data-placeholder="2" type="button" aria-label="Recuerdo 2">
+            <span>🌷</span><small>Recuerdo 2</small>
+          </button>
+          <button class="shot" data-placeholder="3" type="button" aria-label="Recuerdo 3">
+            <span>✨</span><small>Recuerdo 3</small>
+          </button>
+          <button class="shot" data-placeholder="4" type="button" aria-label="Recuerdo 4">
+            <span>🌙</span><small>Recuerdo 4</small>
+          </button>
+        </div>
+
+        <div class="modal" id="modal" aria-hidden="true">
+          <div class="modal-card">
+            <button class="modal-close" id="closeModal" aria-label="Cerrar">✖</button>
+            <img id="modalImg" alt="Recuerdo" />
+            <p class="muted small" id="modalCaption"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JUEGOS -->
+    <section id="juegos" class="section">
+      <div class="grid two">
+        <div class="card">
+          <h2 class="h2">💘 Mini-quiz de pareja</h2>
+          <p class="muted">Responde y mira tu “score romántico”. (Tranquila, aquí no hay reprobación.)</p>
+
+          <form id="quiz" class="quiz">
+            <div class="q">
+              <div class="q-title">1) ¿Qué te mereces hoy?</div>
+              <label><input type="radio" name="q1" value="10" required> Un abrazo gigante</label>
+              <label><input type="radio" name="q1" value="10"> Un detalle lindo</label>
+              <label><input type="radio" name="q1" value="10"> Todo lo anterior</label>
+            </div>
+
+            <div class="q">
+              <div class="q-title">2) Plan perfecto:</div>
+              <label><input type="radio" name="q2" value="10" required> Comer algo rico</label>
+              <label><input type="radio" name="q2" value="10"> Película + cobija</label>
+              <label><input type="radio" name="q2" value="10"> Salir y crear recuerdos</label>
+            </div>
+
+            <div class="q">
+              <div class="q-title">3) ¿Qué somos?</div>
+              <label><input type="radio" name="q3" value="10" required> Equipo</label>
+              <label><input type="radio" name="q3" value="10"> Hogar</label>
+              <label><input type="radio" name="q3" value="10"> Todo lo bonito</label>
+            </div>
+
+            <button class="btn" type="submit">✅ Calcular score</button>
+          </form>
+
+          <div class="result" id="quizResult" hidden></div>
+        </div>
+
+        <div class="card">
+          <h2 class="h2">🎯 “Reto: Atrapa corazones”</h2>
+          <p class="muted">Haz clic en los corazones antes de que desaparezcan. Sí, esto es un minijuego.</p>
+
+          <div class="game">
+            <div class="game-top">
+              <div class="pill">Puntos: <strong id="score">0</strong></div>
+              <button class="btn ghost" id="gameBtn" type="button">▶ Iniciar</button>
+            </div>
+            <div class="arena" id="arena" aria-label="Área de juego"></div>
+            <p class="muted small">Pro tip: el amor se atrapa más fácil con reflejos y besos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section id="final" class="section">
+      <div class="card wide final">
+        <h2 class="h2">💗 Final (pero no el nuestro)</h2>
+        <p class="lead">
+          Luna Maria Ortiz Hortua, gracias por existir en mi vida.
+          Si esta página es linda, es porque tú me inspiras.
+        </p>
+
+        <div class="final-actions">
+          <button class="btn big" id="bigYes" type="button">¿Me regalas un beso? 😳</button>
+          <button class="btn big ghost" id="resetAll" type="button">🔄 Reiniciar magia</button>
+        </div>
+
+        <div class="toast" id="toast" aria-live="polite"></div>
+
+        <footer class="footer">
+          <small>Hecho con amor, pastel y un poquito de obsesión bonita. 💞</small>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- Audio (suave). Puedes cambiar el src por tu mp3 local -->
+  <audio id="bgm" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2e1c0c3f89.mp3?filename=soft-piano-ambient-110624.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="app.js"></script>
+</body>
+</html>
