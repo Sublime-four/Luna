@@ -1,53 +1,36 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>San Valentín — Luna Maria Ortiz Hortua 💘</title>
-  <meta name="description" content="Una página romántica e interactiva para San Valentín." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-</head>
-
-<body>
-  <canvas id="fx" aria-hidden="true"></canvas>
-
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo">💗</span>
-      <div class="brand-text">
-        <strong>San Valentín</strong>
-        <small>para <span class="accent">Luna Maria Ortiz Hortua</span></small>
-      </div>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">💗</span>
+    <div class="brand-text">
+      <strong>San Valentín</strong>
+      <small>para <span class="accent">Luna Maria Ortiz Hortua</span></small>
     </div>
+  </div>
 
-    <nav class="nav">
-      <a href="#inicio">Inicio</a>
-      <a href="#carta">Carta</a>
-      <a href="#contador">Nuestro tiempo</a>
-      <a href="#timeline">Historia</a>
-      <a href="#galeria">Recuerdos</a>
-      <a href="#juegos">Interacciones</a>
-      <a href="#final">Final</a>
-    </nav>
+  <nav class="nav">
+    <a href="#inicio">Inicio</a>
+    <a href="#carta">Carta</a>
+    <a href="#contador">Nuestro tiempo</a>
+    <a href="#timeline">Historia</a>
+    <a href="#galeria">Recuerdos</a>
+    <a href="#juegos">Interacciones</a>
+    <a href="#final">Final</a>
+  </nav>
 
-<div class="actions">
+  <div class="actions">
+    <button class="btn ghost" id="musicBtn" type="button" aria-pressed="false" title="Música">
+      🎵 Labios de cereza
+    </button>
 
-  <button class="btn ghost" id="musicBtn" type="button">
-    🎵 Labios de cereza
-  </button>
+    <button class="btn" id="confettiBtn" type="button" title="Lluvia de amor">
+      ✨ Lluvia romántica
+    </button>
+  </div>
+</header>
 
-  <button class="btn" id="confettiBtn" type="button">
-    ✨ Lluvia romántica
-  </button>
-
-</div>
-
-<!-- Audio oculto -->
-<audio id="bgMusic" loop>
-  <source src="Juan Luis Guerra - Mi Bendicion.mp3" type="audio/mpeg">
+<!-- Audio ÚNICO (local) -->
+<audio id="bgm" preload="auto" loop>
+  <source src="labios.mp3" type="audio/mpeg">
 </audio>
 
   <main>
