@@ -1,22 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ====== Config ======
 const girlfriendName = "Luna Maria Ortiz Hortua";
 // Fecha inicio novios: 12/10/2025 (dd/mm/yyyy) -> 12 Oct 2025
@@ -31,6 +12,7 @@ function pad(n){ return String(n).padStart(2, "0"); }
 
 function showToast(msg){
   const t = $("#toast");
+  if (!t) return;
   t.textContent = msg;
   t.animate(
     [{transform:"translateY(6px)", opacity:.5},{transform:"translateY(0)", opacity:1}],
@@ -42,9 +24,9 @@ function formatDate(d){
   return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
 }
 
-// ====== Canvas FX (hearts + confetti-ish particles) ======
+// ====== Canvas FX (hearts + confetti PRO) ======
 const canvas = $("#fx");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d", { alpha: true });
 let W=0, H=0;
 
 function resize(){
@@ -58,33 +40,59 @@ window.addEventListener("resize", resize);
 resize();
 
 const particles = [];
+const MAX_PARTICLES = 900;
+
+function rand(min, max){ return Math.random() * (max - min) + min; }
+
+function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
 function spawnParticle(x, y, kind="heart"){
+  if (particles.length > MAX_PARTICLES) particles.splice(0, 60);
+
+  const dpr = devicePixelRatio;
   const p = {
-    x: x * devicePixelRatio,
-    y: y * devicePixelRatio,
-    vx: (Math.random()*2-1) * 1.2 * devicePixelRatio,
-    vy: (-Math.random()*2 - 1.2) * devicePixelRatio,
-    r: (Math.random()*10+10) * devicePixelRatio,
+    kind,
+    x: x * dpr,
+    y: y * dpr,
+    vx: rand(-1.2, 1.2) * dpr,
+    vy: rand(-2.6, -1.2) * dpr,
+    g: rand(0.028, 0.055) * dpr,        // gravedad
+    drag: rand(0.985, 0.995),           // aire
+    r: rand(18, 34) * dpr,   // corazones visibles de verdad
     a: 1,
-    rot: Math.random()*Math.PI*2,
-    vr: (Math.random()*2-1) * 0.04,
-    kind
+    life: rand(140, 220),               // frames aprox
+    rot: rand(0, Math.PI*2),
+    vr: rand(-0.08, 0.08),              // velocidad rotación
+    wob: rand(0, Math.PI*2),            // oscilación
+    wobSpeed: rand(0.02, 0.06),
+    // confetti shape
+    w: rand(7, 16) * dpr,
+    h: rand(3, 9) * dpr,
+    colorA: `rgba(255,92,168,${rand(0.55,0.95)})`,
+    colorB: `rgba(124,108,255,${rand(0.45,0.9)})`,
+    colorC: `rgba(255,180,210,${rand(0.45,0.9)})`,
   };
+
+  // Confetti cae desde arriba con más variedad
+  if (kind === "confetti"){
+    p.vx = rand(-1.7, 1.7) * dpr;
+    p.vy = rand(0.2, 1.2) * dpr;
+    p.g  = rand(0.06, 0.12) * dpr;
+    p.r  = rand(3, 7) * dpr;
+    p.life = rand(170, 260);
+  }
+
   particles.push(p);
 }
 
-function heartPath(x,y,s){
-  ctx.save();
-  ctx.translate(x,y);
-  ctx.scale(s,s);
+function heartPath(s){
   ctx.beginPath();
-  ctx.moveTo(0, 0.25);
-  ctx.bezierCurveTo(0, -0.05, -0.45, -0.05, -0.45, 0.25);
-  ctx.bezierCurveTo(-0.45, 0.55, 0, 0.85, 0, 1.05);
-  ctx.bezierCurveTo(0, 0.85, 0.45, 0.55, 0.45, 0.25);
-  ctx.bezierCurveTo(0.45, -0.05, 0, -0.05, 0, 0.25);
+  ctx.moveTo(0, 0.25*s);
+  ctx.bezierCurveTo(0, -0.05*s, -0.45*s, -0.05*s, -0.45*s, 0.25*s);
+  ctx.bezierCurveTo(-0.45*s, 0.55*s, 0, 0.85*s, 0, 1.05*s);
+  ctx.bezierCurveTo(0, 0.85*s, 0.45*s, 0.55*s, 0.45*s, 0.25*s);
+  ctx.bezierCurveTo(0.45*s, -0.05*s, 0, -0.05*s, 0, 0.25*s);
   ctx.closePath();
-  ctx.restore();
 }
 
 function loop(){
@@ -92,77 +100,110 @@ function loop(){
 
   for (let i=particles.length-1; i>=0; i--){
     const p = particles[i];
-    p.x += p.vx;
+
+    // physics
+    p.vx *= p.drag;
+    p.vy *= p.drag;
+    p.vy += p.g;
+
+    // wobble lateral for confetti
+    p.wob += p.wobSpeed;
+    p.x += p.vx + Math.sin(p.wob) * 0.35 * devicePixelRatio;
     p.y += p.vy;
-    p.vy += 0.03 * devicePixelRatio; // gravedad suave
-    p.a -= 0.008;
+
     p.rot += p.vr;
 
+    p.life -= 1;
+    p.a = clamp01(p.life / 220);
+
+    // draw
     ctx.save();
-    ctx.globalAlpha = Math.max(p.a, 0);
+    ctx.globalAlpha = p.a;
 
     if (p.kind === "heart"){
       ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      const grad = ctx.createLinearGradient(-p.r, -p.r, p.r, p.r);
-      grad.addColorStop(0, "rgba(255,92,168,.95)");
-      grad.addColorStop(1, "rgba(124,108,255,.75)");
-      ctx.fillStyle = grad;
-      heartPath(0,0, p.r/40);
-      ctx.fill();
+ctx.rotate(p.rot);
+
+const grad = ctx.createLinearGradient(-p.r, -p.r, p.r, p.r);
+grad.addColorStop(0, p.colorA);
+grad.addColorStop(1, p.colorB);
+ctx.fillStyle = grad;
+
+// Glow romántico
+ctx.shadowColor = "rgba(255,92,168,.35)";
+ctx.shadowBlur  = 18 * devicePixelRatio;
+
+// Escala del corazón (más grande)
+const s = p.r / 10;
+
+// El path del corazón está “más abajo” (0..1.05s), así que lo subimos para centrarlo
+ctx.translate(0, -0.45 * s);
+
+heartPath(s);
+ctx.fill();
+
     } else {
-      // confetti
+      // Confetti: rect + 2 tone flip effect
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
-      ctx.fillStyle = "rgba(255,92,168,.8)";
-      ctx.fillRect(-p.r/2, -p.r/6, p.r, p.r/3);
+
+      // flip-ish (like paper turning)
+      const flip = (Math.sin(p.rot*2) + 1) / 2;
+      ctx.fillStyle = flip > 0.66 ? p.colorA : (flip > 0.33 ? p.colorB : p.colorC);
+
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
     }
 
     ctx.restore();
 
-    if (p.a <= 0 || p.y > H + 50*devicePixelRatio) particles.splice(i,1);
+    // cleanup
+    if (p.a <= 0 || p.y > H + 120*devicePixelRatio) particles.splice(i,1);
   }
 
   requestAnimationFrame(loop);
 }
 loop();
 
-function burstHearts(count=26){
-  const cx = window.innerWidth/2;
-  const cy = window.innerHeight/2;
+// Bursts
+function burstHearts(count=26, x=window.innerWidth/2, y=window.innerHeight/2){
   for (let i=0;i<count;i++){
-    spawnParticle(cx + (Math.random()*240-120), cy + (Math.random()*160-80), "heart");
+    spawnParticle(x + rand(-160,160), y + rand(-110,110), "heart");
   }
 }
 
-function burstConfetti(count=44){
-  const cx = window.innerWidth/2;
-  const cy = 120;
+function burstConfetti(count=120){
+  // from top across width (pro look)
+  const topY = 10;
   for (let i=0;i<count;i++){
-    spawnParticle(cx + (Math.random()*520-260), cy + (Math.random()*80-40), "confetti");
+    spawnParticle(rand(20, window.innerWidth-20), topY + rand(-10, 40), "confetti");
   }
 }
 
+// Ambient interactions
 window.addEventListener("pointermove", (e)=>{
-  if (Math.random() < 0.15) spawnParticle(e.clientX, e.clientY, "heart");
+  if (Math.random() < 0.12) spawnParticle(e.clientX, e.clientY, "heart");
 });
 window.addEventListener("pointerdown", (e)=>{
-  for (let i=0;i<8;i++) spawnParticle(e.clientX, e.clientY, "heart");
+  for (let i=0;i<10;i++) spawnParticle(e.clientX, e.clientY, "heart");
 });
 
 // ====== Envelope ======
 function toggleEnvelope(){
-  $("#envelope").classList.toggle("open");
-  burstHearts(18);
+  const env = $("#envelope");
+  if (!env) return;
+  env.classList.toggle("open");
+  burstHearts(18, window.innerWidth/2, window.innerHeight/2);
 }
-$("#envelope").addEventListener("click", toggleEnvelope);
-$("#envelope").addEventListener("keydown", (e)=>{
+$("#envelope")?.addEventListener("click", toggleEnvelope);
+$("#envelope")?.addEventListener("keydown", (e)=>{
   if (e.key === "Enter" || e.key === " ") toggleEnvelope();
 });
 
 // ====== Copy / Download letter ======
-$("#copyLetter").addEventListener("click", async ()=>{
-  const text = document.querySelector(".paper-inner").innerText.trim();
+$("#copyLetter")?.addEventListener("click", async ()=>{
+  const el = document.querySelector(".paper-inner");
+  if (!el) return;
+  const text = el.innerText.trim();
   try{
     await navigator.clipboard.writeText(text);
     showToast("✅ Carta copiada. Ahora solo falta entregarla con besito incluido.");
@@ -171,8 +212,10 @@ $("#copyLetter").addEventListener("click", async ()=>{
   }
 });
 
-$("#downloadLove").addEventListener("click", ()=>{
-  const text = document.querySelector(".paper-inner").innerText.trim();
+$("#downloadLove")?.addEventListener("click", ()=>{
+  const el = document.querySelector(".paper-inner");
+  if (!el) return;
+  const text = el.innerText.trim();
   const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -194,7 +237,7 @@ $$('#promises input[type="checkbox"]').forEach(cb=>{
     saved[k] = cb.checked;
     localStorage.setItem(promiseKey, JSON.stringify(saved));
     updatePromiseBadge();
-    if (cb.checked) burstHearts(10);
+    if (cb.checked) burstHearts(12);
   });
 });
 
@@ -242,7 +285,7 @@ function tick(){
 setInterval(tick, 1000);
 tick();
 
-$("#toggleCountMode").addEventListener("click", ()=>{
+$("#toggleCountMode")?.addEventListener("click", ()=>{
   countdownMode = (countdownMode === "since") ? "untilAnniversary" : "since";
   showToast(countdownMode === "since"
     ? "⏱️ Modo: contando desde que empezaron."
@@ -257,19 +300,20 @@ function setLove(v){
   $("#progressBar").style.width = `${love}%`;
   $("#loveLevel").textContent = `Amor: ${love}%`;
 }
-$("#sparkBtn").addEventListener("click", ()=>{
+$("#sparkBtn")?.addEventListener("click", ()=>{
   setLove(Math.min(100, love + 7));
-  burstConfetti(24);
+  burstConfetti(90);
   showToast("🌟 Upgrade aplicado. El amor escaló a la nube.");
 });
 setLove(100);
 
-// ====== Moments (custom timeline entries) ======
+// ====== Moments ======
 const momentsKey = "love_moments_v1";
 let moments = JSON.parse(localStorage.getItem(momentsKey) || "[]");
 
 function renderMoments(){
   const box = $("#moments");
+  if (!box) return;
   box.innerHTML = "";
   if (!moments.length){
     const p = document.createElement("p");
@@ -304,7 +348,7 @@ function renderMoments(){
 }
 renderMoments();
 
-$("#addMomentBtn").addEventListener("click", ()=>{
+$("#addMomentBtn")?.addEventListener("click", ()=>{
   const title = prompt("Título del momento (ej: 'Nuestra salida favorita'):");
   if (!title) return;
   const date = prompt("Fecha (ej: 14/02/2026):", "");
@@ -316,28 +360,30 @@ $("#addMomentBtn").addEventListener("click", ()=>{
   showToast("➕ Momento agregado. Roadmap romántico actualizado.");
 });
 
-// ====== Gallery upload + modal ======
+// ====== Gallery + modal ======
 const gallery = $("#gallery");
 const modal = $("#modal");
 const modalImg = $("#modalImg");
 const modalCaption = $("#modalCaption");
 
 function openModal(src, caption){
+  if (!modal) return;
   modal.classList.add("show");
   modal.setAttribute("aria-hidden", "false");
   modalImg.src = src;
   modalCaption.textContent = caption || "";
 }
 function closeModal(){
+  if (!modal) return;
   modal.classList.remove("show");
   modal.setAttribute("aria-hidden", "true");
   modalImg.src = "";
 }
-$("#closeModal").addEventListener("click", closeModal);
-modal.addEventListener("click", (e)=>{ if (e.target === modal) closeModal(); });
+$("#closeModal")?.addEventListener("click", closeModal);
+modal?.addEventListener("click", (e)=>{ if (e.target === modal) closeModal(); });
 window.addEventListener("keydown", (e)=>{ if (e.key === "Escape") closeModal(); });
 
-gallery.addEventListener("click", (e)=>{
+gallery?.addEventListener("click", (e)=>{
   const btn = e.target.closest(".shot");
   if (!btn) return;
   const img = btn.querySelector("img");
@@ -349,11 +395,10 @@ gallery.addEventListener("click", (e)=>{
   }
 });
 
-$("#photoInput").addEventListener("change", (e)=>{
+$("#photoInput")?.addEventListener("change", (e)=>{
   const files = Array.from(e.target.files || []);
-  if (!files.length) return;
+  if (!files.length || !gallery) return;
 
-  // limpia placeholders y llena con imágenes (máx 12 para no romper performance)
   gallery.innerHTML = "";
   files.slice(0,12).forEach((f, i)=>{
     const url = URL.createObjectURL(f);
@@ -367,18 +412,19 @@ $("#photoInput").addEventListener("change", (e)=>{
     gallery.appendChild(b);
   });
 
-  burstConfetti(36);
+  burstConfetti(120);
   showToast("🖼️ Fotos cargadas. Esto ya parece museo del amor.");
 });
 
 // ====== Quiz ======
-$("#quiz").addEventListener("submit", (e)=>{
+$("#quiz")?.addEventListener("submit", (e)=>{
   e.preventDefault();
   const data = new FormData(e.target);
   let score = 0;
   ["q1","q2","q3"].forEach(k=> score += Number(data.get(k) || 0));
 
   const res = $("#quizResult");
+  if (!res) return;
   res.hidden = false;
 
   const msg =
@@ -387,7 +433,7 @@ $("#quiz").addEventListener("submit", (e)=>{
                   "💗 Compatibilidad: igual nos queremos, que es lo que importa.";
 
   res.textContent = `Score: ${score}/30 — ${msg}`;
-  burstHearts(22);
+  burstHearts(28);
 });
 
 // ====== Mini game: Catch hearts ======
@@ -397,6 +443,7 @@ let spawner = null;
 
 function spawnInArena(){
   const arena = $("#arena");
+  if (!arena) return;
   const w = arena.clientWidth;
   const h = arena.clientHeight;
 
@@ -410,7 +457,6 @@ function spawnInArena(){
   el.style.top = `${y}px`;
 
   const ttl = Math.random()*900 + 650;
-
   const kill = setTimeout(()=> el.remove(), ttl);
 
   el.addEventListener("click", ()=>{
@@ -418,17 +464,15 @@ function spawnInArena(){
     el.remove();
     score += 1;
     $("#score").textContent = score;
-    spawnParticle(
-      arena.getBoundingClientRect().left + x + 24,
-      arena.getBoundingClientRect().top + y + 24,
-      "heart"
-    );
+
+    const rect = arena.getBoundingClientRect();
+    burstHearts(6, rect.left + x + 24, rect.top + y + 24);
   });
 
   arena.appendChild(el);
 }
 
-$("#gameBtn").addEventListener("click", ()=>{
+$("#gameBtn")?.addEventListener("click", ()=>{
   gameOn = !gameOn;
   const btn = $("#gameBtn");
 
@@ -437,89 +481,108 @@ $("#gameBtn").addEventListener("click", ()=>{
     $("#score").textContent = score;
     btn.textContent = "⏹ Detener";
     showToast("🎯 Juego iniciado. Atrapa corazones, rápido.");
-    spawner = setInterval(spawnInArena, 380);
+    spawner = setInterval(spawnInArena, 360);
   } else {
     btn.textContent = "▶ Iniciar";
     clearInterval(spawner);
     spawner = null;
     showToast(`🏁 Fin del juego. Puntos: ${score}. (Te debo ${score} besos).`);
-    burstConfetti(28);
-    // limpia arena
+    burstConfetti(120);
     $("#arena").innerHTML = "";
   }
 });
 
-// ====== Buttons: hearts/confetti/music/start/final ======
-$("#confettiBtn").addEventListener("click", ()=>{
-  burstConfetti(60);
-  showToast("✨ Confeti desplegado. Romanticismo en modo turbo.");
-});
-
-$("#startHearts").addEventListener("click", ()=>{
-  burstHearts(60);
+// ====== Buttons (NO duplicados) ======
+$("#startHearts")?.addEventListener("click", ()=>{
+  burstHearts(80);
   showToast("💞 Corazones activados. La página quedó oficialmente enamorada.");
 });
 
-$("#bigYes").addEventListener("click", ()=>{
-  burstConfetti(60);
-  burstHearts(40);
+$("#bigYes")?.addEventListener("click", ()=>{
+  burstConfetti(160);
+  burstHearts(90);
   showToast("😳 Beso aprobado. Procede con cariño y sonrisa.");
 });
 
-$("#resetAll").addEventListener("click", ()=>{
-  // reset UI-ish, sin borrar fotos (por seguridad)
+$("#resetAll")?.addEventListener("click", ()=>{
   setLove(100);
   $("#quizResult").hidden = true;
   $("#envelope").classList.remove("open");
   showToast("🔄 Magia reiniciada. Volvimos al capítulo 1.");
-  burstHearts(24);
+  burstHearts(30);
 });
 
-// ====== Music toggle ======
+// ====== Music toggle (fade in/out) ======
 const bgm = $("#bgm");
+const musicBtn = $("#musicBtn");
 let musicOn = false;
 
-async function toggleMusic(){
-  musicOn = !musicOn;
-  const b = $("#musicBtn");
-  b.setAttribute("aria-pressed", String(musicOn));
-  b.textContent = musicOn ? "🔊 Música" : "🔈 Música";
+function fadeTo(target, ms=650){
+  if (!bgm) return;
+  const start = bgm.volume ?? 1;
+  const t0 = performance.now();
+  function step(t){
+    const k = Math.min(1, (t - t0)/ms);
+    bgm.volume = start + (target - start) * k;
+    if (k < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+async function toggleMusic(forceOn=null){
+  if (!bgm || !musicBtn) return;
+  musicOn = (forceOn === null) ? !musicOn : !!forceOn;
+
+  musicBtn.setAttribute("aria-pressed", String(musicOn));
 
   try{
     if (musicOn){
+      bgm.volume = 0;
       await bgm.play();
+      fadeTo(0.9, 700);
+      musicBtn.textContent = "🔊 Sonando...";
       showToast("🎶 Música ON. Ambiente romántico activado.");
     } else {
-      bgm.pause();
+      fadeTo(0, 450);
+      setTimeout(()=> bgm.pause(), 480);
+      musicBtn.textContent = "🎵 Labios de cereza";
       showToast("🔇 Música OFF. Silencio, pero con amor.");
     }
   }catch{
-    // algunos navegadores bloquean autoplay hasta interacción
-    showToast("⚠️ Tu navegador bloqueó la música. Toca el botón otra vez después de interactuar.");
+    musicOn = false;
+    musicBtn.textContent = "🎵 Labios de cereza";
+    musicBtn.setAttribute("aria-pressed", "false");
+    showToast("⚠️ El navegador bloqueó el audio. Haz clic otra vez (primero interactúa con la página).");
   }
 }
-$("#musicBtn").addEventListener("click", toggleMusic);
+musicBtn?.addEventListener("click", ()=> toggleMusic());
 
-// ====== First load greeting ======
+// Confetti button: activa música si está apagada + FX mejorados
+$("#confettiBtn")?.addEventListener("click", async ()=>{
+  if (!musicOn) await toggleMusic(true);
+
+  burstConfetti(220);
+  burstHearts(90);
+  setLove(100);
+
+  showToast("✨ Lluvia romántica desplegada. Esto ya es nivel concierto.");
+});
+
+// ====== Greeting ======
 showToast(`💗 Bienvenida, ${girlfriendName}. Esta página es para ti.`);
 
 
+// ====== Fix: Activar corazones (a prueba de todo) ======
+window.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("startHearts");
+  if (!btn) {
+    console.warn("❌ No existe el botón #startHearts en el HTML");
+    return;
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  btn.addEventListener("click", () => {
+    console.log("✅ Click en Activar corazones");
+    burstHearts(120, window.innerWidth / 2, window.innerHeight / 2);
+    showToast("💞 Corazones activados. La página quedó oficialmente enamorada.");
+  });
+});
