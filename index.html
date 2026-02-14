@@ -9,41 +9,42 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+</head>
 
-<header class="topbar">
-  <div class="brand">
-    <span class="logo">💗</span>
-    <div class="brand-text">
-      <strong>San Valentín</strong>
-      <small>para <span class="accent">Luna Maria Ortiz Hortua</span></small>
+<body>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">💗</span>
+      <div class="brand-text">
+        <strong>San Valentín</strong>
+        <small>para <span class="accent">Luna Maria Ortiz Hortua</span></small>
+      </div>
     </div>
-  </div>
 
-  <nav class="nav">
-    <a href="#inicio">Inicio</a>
-    <a href="#carta">Carta</a>
-    <a href="#contador">Nuestro tiempo</a>
-    <a href="#timeline">Historia</a>
-    <a href="#galeria">Recuerdos</a>
-    <a href="#juegos">Interacciones</a>
-    <a href="#final">Final</a>
-  </nav>
+    <nav class="nav">
+      <a href="#inicio">Inicio</a>
+      <a href="#carta">Carta</a>
+      <a href="#contador">Nuestro tiempo</a>
+      <a href="#timeline">Historia</a>
+      <a href="#galeria">Recuerdos</a>
+      <a href="#juegos">Interacciones</a>
+      <a href="#final">Final</a>
+    </nav>
+    
+<div class="actions">
 
-  <div class="actions">
-    <button class="btn ghost" id="musicBtn" type="button" aria-pressed="false" title="Música">
-      🎵 Labios de cereza
-    </button>
+  <button class="btn ghost" id="musicBtn" type="button">
+    🎵 Labios de cereza
+  </button>
 
-    <button class="btn" id="confettiBtn" type="button" title="Lluvia de amor">
-      ✨ Lluvia romántica
-    </button>
-  </div>
-</header>
+  <button class="btn" id="confettiBtn" type="button">
+    ✨ Lluvia romántica
+  </button>
 
-<!-- Audio ÚNICO (local) -->
-<audio id="bgm" preload="auto" loop>
-  <source src="labios.mp3" type="audio/mpeg">
-</audio>
+</div>
+  </header>
 
   <main>
     <!-- HERO -->
